@@ -12,6 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.elflin.recipesapp.ui.theme.RecipesAppTheme
+import com.elflin.recipesapp.ui.view.RecipeDetailPreview
+import com.elflin.recipesapp.ui.view.RecipeDetailView
+import com.elflin.recipesapp.ui.view.RecipeListPreview
+import com.elflin.recipesapp.ui.view.RecipeListView
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,28 +24,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             RecipesAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    RecipeDetailPreview(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    RecipesAppTheme {
-        Greeting("Android")
     }
 }
