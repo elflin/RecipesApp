@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             RecipesAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    RecipeDetailPreview(
+                    RecipeListPreview(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

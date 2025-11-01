@@ -14,14 +14,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elflin.recipesapp.ui.model.Meal
+import com.elflin.recipesapp.ui.viewmodel.RecipeListViewModel
 
 @Composable
 fun RecipeListView(
     modifier: Modifier = Modifier,
-    allRecipes: List<Meal>
+    viewModel: RecipeListViewModel = viewModel()
 ) {
 
+    val allRecipes: List<Meal> by viewModel.allRecipes.collectAsState()
     var searchText by remember { mutableStateOf("") }
 
     val filteredRecipes = allRecipes.filter { meal ->
@@ -105,5 +108,5 @@ fun RecipeListPreview(
         sampleMeal4
     )
 
-    RecipeListView(allRecipes = dummyRecipes, modifier = modifier)
+    RecipeListView(modifier = modifier)
 }
