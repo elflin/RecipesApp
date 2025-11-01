@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.elflin.recipesapp.ui.route.AppRoute
 import com.elflin.recipesapp.ui.theme.RecipesAppTheme
 import com.elflin.recipesapp.ui.view.RecipeDetailPreview
 import com.elflin.recipesapp.ui.view.RecipeDetailView
@@ -23,11 +24,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RecipesAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    RecipeListPreview(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppRoute()
             }
         }
     }

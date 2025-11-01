@@ -7,6 +7,7 @@ import retrofit2.http.Query
 
 interface MealDBService {
 
+    // Tidak di pakai
     @GET("search.php")
     suspend fun SearchMealbyName(
         @Query("s") name: String
@@ -17,6 +18,7 @@ interface MealDBService {
         @Query("i") id: Int
     ): Response<ResponseAPIMeal>
 
+    // Tidak di pakai
     @GET("search.php")
     suspend fun SearchMealbyFirstLetter(
         @Query("f") keyLetter: String

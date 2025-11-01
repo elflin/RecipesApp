@@ -1,6 +1,7 @@
 package com.elflin.recipesapp.ui.view
 
 import android.content.Intent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,9 +12,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -22,98 +28,116 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.elflin.recipesapp.ui.model.Meal
+import com.elflin.recipesapp.ui.viewmodel.RecipeDetailViewModel
 
 @Composable
 fun RecipeDetailView(
     modifier: Modifier = Modifier,
-    meal: Meal
+    id: Int,
+    viewModel: RecipeDetailViewModel = viewModel()
 ) {
 
+    LaunchedEffect(key1 = id) {
+        viewModel.loadData(id)
+    }
+
+    val meal: Meal? by viewModel.meal.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(meal.mealThumb)
-                .crossfade(true)
-                .build(),
-            contentDescription = "${meal.meal} Thumbnail",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp)
-                .clip(RoundedCornerShape(12.dp)),
-            contentScale = ContentScale.Crop
-        )
+    if (meal == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }else {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+        ) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(meal!!.mealThumb)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "${meal!!.meal} Thumbnail",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = meal.meal,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "${meal.category} • ${meal.area}",
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "ID: ${meal.id}",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        meal.linkYoutube.takeIf { it.isNotBlank() }?.let { youtubeLink ->
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    // 1. Buat Intent dengan aksi VIEW
-                    val intent = Intent(Intent.ACTION_VIEW, youtubeLink.toUri())
+            Text(
+                text = meal!!.meal,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
 
-                    // 2. Coba jalankan Intent
-                    try {
-                        context.startActivity(intent)
-                    } catch (e: Exception) {
-                        // Handle kasus di mana tidak ada aplikasi yang dapat menangani URL (jarang terjadi)
-                        e.printStackTrace()
-                        // Opsional: Tampilkan Toast kepada pengguna
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Tonton Tutorial di YouTube")
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "${meal!!.category} • ${meal!!.area}",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "ID: ${meal!!.id}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            meal!!.linkYoutube.takeIf { it.isNotBlank() }?.let { youtubeLink ->
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        // 1. Buat Intent dengan aksi VIEW
+                        val intent = Intent(Intent.ACTION_VIEW, youtubeLink.toUri())
+
+                        // 2. Coba jalankan Intent
+                        try {
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            // Handle kasus di mana tidak ada aplikasi yang dapat menangani URL (jarang terjadi)
+                            e.printStackTrace()
+                            // Opsional: Tampilkan Toast kepada pengguna
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Tonton Tutorial di YouTube")
+                }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Instruksi:",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = meal!!.instructions,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Instruksi:",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-        Text(
-            text = meal.instructions,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
     }
 }
 
@@ -132,5 +156,5 @@ fun RecipeDetailPreview(
         linkYoutube = "https://www.youtube.com/watch?v=BFdQUgAFtGU"
     )
 
-    RecipeDetailView(meal = sampleDetailMeal, modifier = modifier)
+    RecipeDetailView(id = sampleDetailMeal.id, modifier = modifier)
 }

@@ -14,17 +14,22 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.elflin.recipesapp.ui.model.Meal
+import com.elflin.recipesapp.ui.route.AppView
 import com.elflin.recipesapp.ui.viewmodel.RecipeListViewModel
 
 @Composable
 fun RecipeListView(
     modifier: Modifier = Modifier,
-    viewModel: RecipeListViewModel = viewModel()
+    viewModel: RecipeListViewModel = viewModel(),
+    navController: NavController = rememberNavController()
 ) {
 
-    val allRecipes: List<Meal> by viewModel.allRecipes.collectAsState()
+    val allRecipes: List<Meal> by viewModel.allRecipes.collectAsStateWithLifecycle()
     var searchText by remember { mutableStateOf("") }
 
     val filteredRecipes = allRecipes.filter { meal ->
@@ -61,7 +66,10 @@ fun RecipeListView(
                 modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp)
             ) {
                 items(filteredRecipes) { meal ->
-                    MealCard(meal = meal)
+                    MealCard(
+                        meal = meal,
+                        cardClick = { navController.navigate(AppView.RecipeDetailView.name + "/${meal.id}") }
+                    )
                 }
             }
         }
